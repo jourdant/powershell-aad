@@ -8,9 +8,9 @@ Class AadAccessToken {
 }
 
 function Get-AadAccessToken (
-    [Parameter(Mandatory=$true)][string]$ClientID, 
+    [Parameter(Mandatory=$true)][string]$ClientId, 
     [Parameter(Mandatory=$true)][string]$ClientSecret, 
-    [Parameter(Mandatory=$true)][string]$TenantID, 
+    [Parameter(Mandatory=$true)][string]$TenantId, 
     [Parameter(Mandatory=$true)][string]$Resource) {
     
     $uri = "https://login.microsoftonline.com/$TenantID/oauth2/token"
