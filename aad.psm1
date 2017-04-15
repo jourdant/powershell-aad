@@ -7,7 +7,12 @@ Class AadAccessToken {
     [string]$Value
 }
 
-function Get-AadAccessToken ($ClientID, $ClientSecret, $TenantID, $Resource) {
+function Get-AadAccessToken (
+    [Parameter(Mandatory=$true)][string]$ClientID, 
+    [Parameter(Mandatory=$true)][string]$ClientSecret, 
+    [Parameter(Mandatory=$true)][string]$TenantID, 
+    [Parameter(Mandatory=$true)][string]$Resource) {
+    
     $uri = "https://login.microsoftonline.com/$TenantID/oauth2/token"
     $headers = @{ Accepts="application/json" }
     $body = @{
@@ -18,6 +23,8 @@ function Get-AadAccessToken ($ClientID, $ClientSecret, $TenantID, $Resource) {
     }    
 
     $token = Invoke-RestMethod -Uri $uri -Body $body -ContentType "application/x-www-form-urlencoded" -Method Post -Headers $headers
+    if ($token.access_token -eq $null) { throw "Could not retrieve bearer token with provided details." }
+
     $ret = New-Object AadAccessToken -Prop @{
         Expiry=([datetime]"1970-01-01 00:00:00").AddSeconds($token.expires_on);
         Resource=$token.resource;
@@ -28,7 +35,12 @@ function Get-AadAccessToken ($ClientID, $ClientSecret, $TenantID, $Resource) {
     return $ret
 }
 
-function Invoke-AadWebRequest ($Url, [AadAccessToken]$AadAccessToken, $Method="Get", $Body=$null) {
+function Invoke-AadWebRequest (
+    [Parameter(Mandatory=$true)][string]$Url, 
+    [Parameter(Mandatory=$true)][AadAccessToken]$AadAccessToken, 
+    [Parameter(Mandatory=$false)][string]$Method="Get", 
+    [Parameter(Mandatory=$false)][string]$Body=$null) {
+
     $headers = @{ 
         Accepts="application/json";
         Authorization="Bearer $($Authorization.value)";
